@@ -2,7 +2,6 @@ import csv
 import json
 import argparse
 from datetime import datetime, timedelta
-from xmlrpc.client import Boolean, boolean
 
 class Flight:
     """
