@@ -1,6 +1,7 @@
 import csv
 import json
 import argparse
+from datetime import datetime
 
 def arg_parser():
     parser = argparse.ArgumentParser(description='Kiwi task solution')
@@ -45,7 +46,7 @@ def main():
                         "destination": destination,
                         "origin": origin,
                         "total_price": base_price + bag_price * arg_bags,
-                        "travel_time": "TBD"
+                        "travel_time": str(datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S"))
                         }]
 
                 output = json.dumps(fligts, indent=4)
