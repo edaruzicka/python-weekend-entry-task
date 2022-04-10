@@ -1,23 +1,23 @@
-# Python weekend entry task
+# Python weekend entry task - solution by Eduard Ruzicka - edaruzicka@seznam.cz
 
-**Write a python script/module/package, that for a given flight data in a form of `csv` file (check the examples), prints out a structured list of all flight combinations for a selected route between airports A -> B, sorted by the final price for the trip.**
+**A python script, that for a given flight data in a form of `csv` file, prints out a json of all flight combinations for a selected route between airports A -> B, sorted by the final price for the trip.**
 
 ### Description
-You've been provided with some semi-randomly generated example csv datasets you can use to test your solution. The datasets have following columns:
+CSV file structure:
 - `flight_no`: Flight number.
 - `origin`, `destination`: Airport codes.
 - `departure`, `arrival`: Dates and times of the departures/arrivals.
 - `base_price`, `bag_price`: Prices of the ticket and one piece of baggage.
 - `bags_allowed`: Number of allowed pieces of baggage for the flight.
 
-In addition to the dataset, your script will take some additional arguments as input:
+Required arguments:
 
 | Argument name | type    | Description              | Notes                        |
 |---------------|---------|--------------------------|------------------------------|
 | `origin`      | string  | Origin airport code      |                              |
 | `destination` | string  | Destination airport code |                              |
 
-### Search restrictions
+### Search restrictions - all are implemented
 - By default you're performing search on ALL available combinations, according to search parameters.
 - In case of a combination of A -> B -> C, the layover time in B should **not be less than 1 hour and more than 6 hours**.
 - No repeating airports in the same trip!
@@ -25,24 +25,20 @@ In addition to the dataset, your script will take some additional arguments as i
 - Output is sorted by the final price of the trip.
 
 #### Optional arguments
-You may add any number of additional search parameters to boost your chances to attend. Here are 2 recommended ones:
 
 | Argument name | type    | Description              | Notes                        |
 |---------------|---------|--------------------------|------------------------------|
 | `bags`        | integer | Number of requested bags | Optional (defaults to 0)     |
-| `return`      | boolean | Is it a return flight?   | Optional (defaults to false) |
 
 ##### Performing return trip search
-Example input (assuming `solution.py` is the main module):
+Example input, `solution.py` is the main module:
 ```
-python -m solution example/example0.csv RFZ WIW --bags=1 --return
+python -m solution example/example0.csv RFZ WIW --bags=1
 ```
-will perform a search RFZ -> WIW -> RFZ for flights which allow at least 1 piece of baggage.
-
-- **NOTE:** Since WIW is in this case the final destination for one part of the trip, the layover rule does not apply.
+will perform a search RFZ -> WIW for flights which allow at least 1 piece of baggage.
 
 #### Output
-The output will be a json-compatible structured list of trips sorted by price. The trip has the following schema:
+The output is a json-compatible structured list of trips sorted by price. The trip has the following schema:
 | Field          | Description                                                   |
 |----------------|---------------------------------------------------------------|
 | `flights`      | A list of flights in the trip according to the input dataset. |
@@ -53,84 +49,191 @@ The output will be a json-compatible structured list of trips sorted by price. T
 | `total_price`  | The total price for the trip.                                 |
 | `travel_time`  | The total travel time.                                        |
 
-**For more information, check the example section.**
-
-### Points of interest
-Assuming your solution is working, we'll be additionally judging based on following skills:
-- input, output - what if we input garbage?
-- modules, packages & code structure (hint: it's easy to overdo it)
-- usage of standard library and built-in data structures
-- code readability, clarity, used conventions, documentation and comments
-
-## Requirements and restrictions
-- **Your solution needs to contain a README file describing what it does and how to run it.**
-- Only the standard library is allowed, no 3rd party packages, notebooks, specialized distros (Conda) etc.
-- The code should run as is, no environment setup should be required.
-
-## Submissions
-Follow the instructions you received in the email.
-
 ## Example behaviour
 
-Let's imagine we wrote our solution into one file, `solution.py` and our datatset is in `data.csv`.
-We want to test the script by performing a flight search on route BTW -> REJ (we know the airports are present in the dataset) with one bag. We run the thing:
+I wrote the solution into one file, `solution.py` and the example datatsets are in folder `examples`.
+We want to test the script by performing a flight search on route NRX -> DHE (we know the airports are present in the dataset) with two bags. We run the thing:
 
 ```bash
-python -m solution data.csv BTW REJ --bags=1
+python -m solution example/example1.csv NRX DHE --bags=2
 ```
 and get the following result:
 
 ```json
 [
     {
-        "flights": [
-            {
-                "flight_no": "XC233",
-                "origin": "BTW",
-                "destination": "WTF",
-                "departure": "2021-09-02T05:50:00",
-                "arrival": "2021-09-02T8:20:00",
-                "base_price": 67.0,
-                "bag_price": 7.0,
-                "bags_allowed": 2
-            },
-            {
-                "flight_no": "VJ832",
-                "origin": "WTF",
-                "destination": "REJ",
-                "departure": "2021-09-02T11:05:00",
-                "arrival": "2021-09-02T12:45:00",
-                "base_price": 31.0,
-                "bag_price": 5.0,
-                "bags_allowed": 1
-            }
-        ],
-        "bags_allowed": 1,
-        "bags_count": 1,
-        "destination": "REJ",
-        "origin": "BTW",
-        "total_price": 110.0,
-        "travel_time": "6:55:00"
+        "flights": {
+            "flight_no": "IM218",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-02T04:35:00",
+            "arrival": "2021-09-02T08:40:00",
+            "base_price": 120.0,
+            "bag_price": 9.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 138.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "IM218",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-04T04:35:00",
+            "arrival": "2021-09-04T08:40:00",
+            "base_price": 120.0,
+            "bag_price": 9.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 138.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "IM218",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-08T04:35:00",
+            "arrival": "2021-09-08T08:40:00",
+            "base_price": 120.0,
+            "bag_price": 9.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 138.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "IM218",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-13T04:35:00",
+            "arrival": "2021-09-13T08:40:00",
+            "base_price": 120.0,
+            "bag_price": 9.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 138.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "WM094",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-02T06:30:00",
+            "arrival": "2021-09-02T10:35:00",
+            "base_price": 122.0,
+            "bag_price": 12.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 146.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "WM094",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-03T06:30:00",
+            "arrival": "2021-09-03T10:35:00",
+            "base_price": 122.0,
+            "bag_price": 12.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 146.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "WM094",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-07T06:30:00",
+            "arrival": "2021-09-07T10:35:00",
+            "base_price": 122.0,
+            "bag_price": 12.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 146.0,
+        "travel_time": "4:05:00"
+    },
+    {
+        "flights": {
+            "flight_no": "WM094",
+            "origin": "SML",
+            "destination": "NIZ",
+            "departure": "2021-09-12T06:30:00",
+            "arrival": "2021-09-12T10:35:00",
+            "base_price": 122.0,
+            "bag_price": 12.0,
+            "bags_allowed": 2
+        },
+        "bags_allowed": 2,
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 146.0,
+        "travel_time": "4:05:00"
     },
     {
         "flights": [
             {
-                "flight_no": "JV042",
-                "origin": "BTW",
-                "destination": "REJ",
-                "departure": "2021-09-01T17:35:00",
-                "arrival": "2021-09-01T21:05:00",
-                "base_price": 216.0,
-                "bag_price": 11.0,
+                "flight_no": "WM608",
+                "origin": "SML",
+                "destination": "DHE",
+                "departure": "2021-09-02T02:15:00",
+                "arrival": "2021-09-02T03:45:00",
+                "base_price": 46.0,
+                "bag_price": 12.0,
+                "bags_allowed": 2
+            },
+            {
+                "flight_no": "IM405",
+                "origin": "DHE",
+                "destination": "NIZ",
+                "departure": "2021-09-02T08:20:00",
+                "arrival": "2021-09-02T13:30:00",
+                "base_price": 219.0,
+                "bag_price": 9.0,
                 "bags_allowed": 2
             }
         ],
         "bags_allowed": 2,
-        "bags_count": 1,
-        "destination": "REJ",
-        "origin": "BTW",
-        "total_price": 227.0,
-        "travel_time": "3:30:00"
+        "bags_count": 2,
+        "destination": "NIZ",
+        "origin": "SML",
+        "total_price": 307.0,
+        "travel_time": "11:15:00"
     }
 ]
 ```
