@@ -43,10 +43,10 @@ def arg_parser():
     """Argument parser function"""
     parser = argparse.ArgumentParser(description='Kiwi task solution')
     parser.add_argument('csv_file', help='csv file path')
-    parser.add_argument('origin', help='origin')
-    parser.add_argument('destination', help='destination')
-    parser.add_argument('-b', '--bags', help='bags', required=False, type=int, default=0)
-    parser.add_argument('-r', '--return', help='return', required=False, default=False)
+    parser.add_argument('origin', help='origin airport')
+    parser.add_argument('destination', help='destination airport')
+    parser.add_argument('-b', '--bags', help='number of bags', required=False, type=int, default=0)
+    parser.add_argument('-r', '--return', help='return flight - not implemented', required=False, default=False)
     args = vars(parser.parse_args())
     return args
 
@@ -55,7 +55,9 @@ def main():
     
     Creates Flight class instances, then searches for all the possible routes
     depending on initial arguments, prints and returns json with flights
-    sorted by total price
+    sorted by total price.
+
+    Maximum number of transfer flights is 1, meaning its possible to only find routes A -> B and A -> B -> C.
     """
 
     args = arg_parser()
@@ -67,7 +69,7 @@ def main():
 
     with open(arg_csv_filename) as csv_file:
         reader = csv.reader(csv_file, delimiter=',')
-        next(reader) # skip headers
+        next(reader) # skips headers
 
         flights = []
         flightsDest = []
@@ -87,7 +89,7 @@ def main():
         # find all flights, which end in desired destination
         for flightDest in flightsDest:
             trip = {}
-            
+
             # 1 flight: A -> B
             if flightDest.origin == arg_origin and flightDest.destination == arg_destination:
                 trip["flights"] = flightDest.__dict__
