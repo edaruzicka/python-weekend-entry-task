@@ -51,7 +51,7 @@ The output is a json-compatible structured list of trips sorted by price. The tr
 
 ## Example behaviour
 
-I wrote the solution into one file, `solution.py` and the example datatsets are in folder `examples`.
+I wrote the solution into one file, `solution.py` and the example datatsets are in folder `example`.
 We want to test the script by performing a flight search on route NRX -> DHE (we know the airports are present in the dataset) with two bags. We run the thing:
 
 ```bash
