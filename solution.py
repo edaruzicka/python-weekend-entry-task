@@ -4,6 +4,31 @@ import argparse
 from datetime import datetime, timedelta
 
 class Flight:
+    """
+    A class used to represent a Flight
+
+    ...
+
+    Attributes
+    ----------
+    flight_no : str
+        flight number
+    origin : str
+        origin airport
+    destination : str
+        destination airport
+    departure : str
+        departure time
+    arrival : str
+        arrival time
+    base_price : float
+        base price for the flight
+    bag_price : float
+        price for each bag carried by the passenger
+    bags_allowed : int
+        maximum allowed number of bags on the flight
+    """
+
     def __init__(self, flight_no, origin, destination, departure, arrival, base_price, bag_price, bags_allowed):
         self.flight_no = flight_no
         self.origin = origin
@@ -15,6 +40,7 @@ class Flight:
         self.bags_allowed = bags_allowed
 
 def arg_parser():
+    """Argument parser function"""
     parser = argparse.ArgumentParser(description='Kiwi task solution')
     parser.add_argument('csv_file', help='csv file path')
     parser.add_argument('origin', help='origin')
@@ -25,6 +51,13 @@ def arg_parser():
     return args
 
 def main():
+    """Main function. 
+    
+    Creates Flight class instances, then searches for all the possible routes
+    depending on initial arguments, prints and returns json with flights
+    sorted by total price
+    """
+
     args = arg_parser()
     arg_csv_filename = args.get('csv_file')
     arg_origin = args.get('origin')
@@ -40,9 +73,8 @@ def main():
         flightsDest = []
         finalOutput =  []
 
-        # for row in csv file
+
         for row in reader:
-            # flight_no, origin, destination, departure, arrival, base_price, bag_price, bags_allowed = i, row[0], row[1], row[2], row[3], row[4], float(row[5]), float(row[6]), int(row[7])
             
             # create Flight instances and add to list
             flights.append(Flight(row[0], row[1], row[2], row[3], row[4], float(row[5]), float(row[6]), int(row[7])))
@@ -55,7 +87,7 @@ def main():
         # find all flights, which end in desired destination
         for flightDest in flightsDest:
             trip = {}
-            tripInfo = []
+            
             # 1 flight: A -> B
             if flightDest.origin == arg_origin and flightDest.destination == arg_destination:
                 trip["flights"] = flightDest.__dict__
@@ -96,6 +128,7 @@ def main():
         
         finalOutput.sort(key=lambda x: x["total_price"])
         print(json.dumps(finalOutput, indent=4, sort_keys=False))
+        return json.dumps(finalOutput, indent=4, sort_keys=False)
 
 if __name__ == "__main__":
     main()
