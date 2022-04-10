@@ -4,26 +4,23 @@ import argparse
 from datetime import datetime, timedelta
 
 class Flight:
-  def __init__(self, flight_no, origin, destination, departure, arrival, base_price, bag_price, bags_allowed):
-    self.flight_no = flight_no
-    self.origin = origin
-    self.destination = destination
-    self.departure = departure
-    self.arrival = arrival
-    self.base_price = base_price
-    self.bag_price = bag_price
-    self.bags_allowed = bags_allowed
-
-def show(self):
-    print(self.flight_no, self.origin, self.destination, self.departure, self.arrival, self.base_price, self.bag_price, self.bags_allowed)
+    def __init__(self, flight_no, origin, destination, departure, arrival, base_price, bag_price, bags_allowed):
+        self.flight_no = flight_no
+        self.origin = origin
+        self.destination = destination
+        self.departure = departure
+        self.arrival = arrival
+        self.base_price = base_price
+        self.bag_price = bag_price
+        self.bags_allowed = bags_allowed
 
 def arg_parser():
     parser = argparse.ArgumentParser(description='Kiwi task solution')
     parser.add_argument('csv_file', help='csv file path')
     parser.add_argument('origin', help='origin')
     parser.add_argument('destination', help='destination')
-    parser.add_argument('-b', '--bags', help='bags', required=False, type=int)
-    parser.add_argument('-r', '--return', help='return', required=False)
+    parser.add_argument('-b', '--bags', help='bags', required=False, type=int, default=0)
+    parser.add_argument('-r', '--return', help='return', required=False, default=False)
     args = vars(parser.parse_args())
     return args
 
@@ -62,14 +59,6 @@ def main():
             # 1 flight: A -> B
             if flightDest.origin == arg_origin and flightDest.destination == arg_destination:
                 trip["flights"] = flightDest.__dict__
-                tripInfo = {
-                    "bags_allowed": flightDest.bags_allowed,
-                    "bags_count": arg_bags,
-                    "destination": flightDest.destination,
-                    "origin": flightDest.origin,
-                    "total_price": flightDest.base_price + flightDest.bag_price * arg_bags,
-                    "travel_time": str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S"))
-                }
 
                 trip["bags_allowed"] = flightDest.bags_allowed
                 trip["bags_count"] = arg_bags
@@ -78,7 +67,7 @@ def main():
                 trip["total_price"] = flightDest.base_price + flightDest.bag_price * arg_bags
                 trip["travel_time"] = str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S"))
                 
-                if trip["bags_count"] >= arg_bags:
+                if trip["bags_allowed"] >= arg_bags:
                     finalOutput.append(trip)
 
                 continue
@@ -86,7 +75,10 @@ def main():
             for flight in flights:
                 # 2 flights: A -> B -> C
                 if flight.destination == flightDest.origin:
+
+                    # waiting time at the airport between flights
                     layoverTime = datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flight.arrival, "%Y-%m-%dT%H:%M:%S")
+
                     if flight.origin == arg_origin and layoverTime > timedelta(hours = 1) and layoverTime < timedelta(hours = 6):
                         trip["flights"] = flight.__dict__, flightDest.__dict__
 
@@ -95,11 +87,11 @@ def main():
                         trip["destination"] = flightDest.destination
                         trip["origin"] = flight.origin
                         trip["total_price"] = flightDest.base_price + flight.base_price + flightDest.bag_price * arg_bags + flight.bag_price * arg_bags
-                        trip["travel_time"] = str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S"))
+                        trip["travel_time"] = str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flight.departure, "%Y-%m-%dT%H:%M:%S"))
 
-                        if trip["bags_count"] >= arg_bags:
+                        if trip["bags_allowed"] >= arg_bags:
                             finalOutput.append(trip)
-                            
+
                         break
         
         finalOutput.sort(key=lambda x: x["total_price"])
