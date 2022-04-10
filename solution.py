@@ -57,11 +57,11 @@ def main():
 
         # find all flights, which end in desired destination
         for flightDest in flightsDest:
-            trip = []
+            trip = {}
             tripInfo = []
             # 1 flight: A -> B
             if flightDest.origin == arg_origin and flightDest.destination == arg_destination:
-                trip.append(flightDest.__dict__)
+                trip["flights"] = flightDest.__dict__
                 tripInfo = {
                     "bags_allowed": flightDest.bags_allowed,
                     "bags_count": arg_bags,
@@ -71,11 +71,16 @@ def main():
                     "travel_time": str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S"))
                 }
 
-                print("TEST " + info for info in tripInfo)
+                trip["bags_allowed"] = flightDest.bags_allowed
+                trip["bags_count"] = arg_bags
+                trip["destination"] = flightDest.destination
+                trip["origin"] = flightDest.origin
+                trip["total_price"] = flightDest.base_price + flightDest.bag_price * arg_bags
+                trip["travel_time"] = str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S"))
                 
-                finalOutput.append(trip)
-                finalOutput.append(tripInfo)
-                print("\n")
+                if trip["bags_count"] >= arg_bags:
+                    finalOutput.append(trip)
+
                 continue
 
             for flight in flights:
@@ -83,40 +88,22 @@ def main():
                 if flight.destination == flightDest.origin:
                     layoverTime = datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flight.arrival, "%Y-%m-%dT%H:%M:%S")
                     if flight.origin == arg_origin and layoverTime > timedelta(hours = 1) and layoverTime < timedelta(hours = 6):
-                        trip.append(flight.__dict__)
-                        trip.append(flightDest.__dict__)
-                        finalOutput.append(trip)
-                        
-                        print("\n")
+                        trip["flights"] = flight.__dict__, flightDest.__dict__
+
+                        trip["bags_allowed"] = min(flightDest.bags_allowed, flight.bags_allowed)
+                        trip["bags_count"] = arg_bags
+                        trip["destination"] = flightDest.destination
+                        trip["origin"] = flight.origin
+                        trip["total_price"] = flightDest.base_price + flight.base_price + flightDest.bag_price * arg_bags + flight.bag_price * arg_bags
+                        trip["travel_time"] = str(datetime.strptime(flightDest.arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(flightDest.departure, "%Y-%m-%dT%H:%M:%S"))
+
+                        if trip["bags_count"] >= arg_bags:
+                            finalOutput.append(trip)
+                            
                         break
-
-        print(json.dumps(finalOutput, indent=4))
-            
-
-        """ if origin == arg_origin and destination == arg_destination:
-            #print(row)
-
-            fligts = [{'flights':
-                        [{
-                        'flight_no': flight_no,
-                        'origin': origin,
-                        'destination': destination,
-                        'departure': departure,
-                        'arrival': arrival,
-                        'base_price': base_price,
-                        'bag_price': bag_price,
-                        'bags_allowed': bags_allowed
-                        }],
-                    "bags_allowed": bags_allowed,
-                    "bags_count": arg_bags,
-                    "destination": destination,
-                    "origin": origin,
-                    "total_price": base_price + bag_price * arg_bags,
-                    "travel_time": str(datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S") - datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S"))
-                    }]
-
-            output = json.dumps(fligts, indent=4)
-            print(output) """
+        
+        finalOutput.sort(key=lambda x: x["total_price"])
+        print(json.dumps(finalOutput, indent=4, sort_keys=False))
 
 if __name__ == "__main__":
     main()
