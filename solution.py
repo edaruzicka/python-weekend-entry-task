@@ -86,7 +86,7 @@ def main():
             if flight.destination == arg_destination:
                 flightsDest.append(flight)
 
-        # find all flights, which end in desired destination
+        # find all possible routes, which end in desired destination
         for flightDest in flightsDest:
             trip = {}
 
@@ -106,8 +106,8 @@ def main():
 
                 continue
 
+            # 2 flights: A -> B -> C
             for flight in flights:
-                # 2 flights: A -> B -> C
                 if flight.destination == flightDest.origin:
 
                     # waiting time at the airport between flights
